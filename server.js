@@ -815,14 +815,4 @@ app.post("/rollback", async (req, res) => {
     }
 });
 
-
-//
-// SERVER
-//
-app.listen(5000, () => {
-
-    console.log(
-
-        "Server running on http://localhost:5000"
-    );
-});
+module.exports = app;
