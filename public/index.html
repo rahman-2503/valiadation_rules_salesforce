@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Salesforce Validation Manager</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+</head>
+
+<body>
+
+    <div class="background-glow"></div>
+
+    <div class="main-container">
+
+        <div class="glass-card">
+
+            <div class="top-badge">
+                Salesforce Admin Console
+            </div>
+
+            <h1 class="main-heading">
+                Validation Rule Manager
+            </h1>
+
+            <p class="project-description">
+
+                Manage Salesforce Validation Rules with
+                secure OAuth authentication,
+                dynamic deployment workflows,
+                rollback recovery,
+                and real-time metadata control.
+
+            </p>
+
+            <!-- LOGIN -->
+            <div id="loginSection">
+
+                <button class="primary-btn"
+                        onclick="loginSalesforce()">
+
+                    Login With Salesforce
+
+                </button>
+
+            </div>
+
+            <!-- DASHBOARD -->
+            <div id="dashboardSection"
+                 style="display:none;">
+
+                <div class="user-card">
+
+                    <div id="userInfo"></div>
+
+                </div>
+
+                <div class="dashboard-actions">
+
+                    <button class="primary-btn"
+                            onclick="showMetadataLoader()">
+
+                        Open Validation Rules
+
+                    </button>
+
+                    <button class="danger-btn"
+                            onclick="logout()">
+
+                        Logout
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

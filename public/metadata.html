@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Validation Rules Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+</head>
+
+<body>
+
+    <div class="background-glow"></div>
+
+    <div class="main-container">
+
+        <div class="glass-card">
+
+            <div class="top-bar">
+
+                <div>
+
+                    <div class="top-badge">
+                        Validation Control Center
+                    </div>
+
+                    <h1 class="main-heading small-heading">
+                        Validation Rules
+                    </h1>
+
+                </div>
+
+                <button class="secondary-btn"
+                        onclick="goHome()">
+
+                    Back
+
+                </button>
+
+            </div>
+
+            <div class="user-card">
+
+                <div id="metaUserInfo"></div>
+
+            </div>
+
+            <!-- ACTION BUTTONS -->
+
+            <div class="button-group">
+
+                <button class="success-btn"
+                        onclick="enableAllRules()">
+
+                    Enable All
+
+                </button>
+
+                <button class="danger-btn"
+                        onclick="disableAllRules()">
+
+                    Disable All
+
+                </button>
+
+                <button class="warning-btn"
+                        onclick="rollbackRules()">
+
+                    Rollback
+
+                </button>
+
+                <button id="deployBtn"
+                        class="primary-btn"
+                        onclick="deployChanges()">
+
+                    Deploy Changes
+
+                </button>
+
+            </div>
+
+            <!-- RULES -->
+
+            <ul id="rulesList"></ul>
+
+        </div>
+
+    </div>
+
+    <script src="metadata.js"></script>
+
+</body>
+
+</html>
