@@ -3,18 +3,31 @@ const axios = require("axios");
 const cors = require("cors");
 const crypto = require("crypto");
 const path = require("path");
+const session = require("express-session");
 
 require("dotenv").config();
 
 const app = express();
 
 app.use(cors());
+
 app.use(express.json());
 
 app.use(
     express.static(
         path.join(__dirname, "public")
     )
+);
+
+app.use(
+    session({
+        secret: "salesforce_secret_key",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            secure: false
+        }
+    })
 );
 
 const PORT =
@@ -31,13 +44,6 @@ const REDIRECT_URI =
 
 const LOGIN_URL =
     process.env.LOGIN_URL;
-
-let accessToken = "";
-let instanceUrl = "";
-let username = "";
-let orgName = "";
-
-let originalRuleStates = {};
 
 const CODE_VERIFIER =
     "salesforcevalidationproject123456";
@@ -239,10 +245,10 @@ app.get("/callback", async (req, res) => {
             }
         );
 
-        accessToken =
+        req.session.accessToken =
             tokenResponse.data.access_token;
 
-        instanceUrl =
+        req.session.instanceUrl =
             tokenResponse.data.instance_url;
 
         const identityUrl =
@@ -254,16 +260,18 @@ app.get("/callback", async (req, res) => {
                 headers: {
 
                     Authorization:
-                    `Bearer ${accessToken}`
+                    `Bearer ${req.session.accessToken}`
                 }
             });
 
-        username =
+        req.session.username =
             userResponse.data.username;
 
-        orgName =
+        req.session.orgName =
             userResponse.data.organization_name
             || "Salesforce";
+
+        req.session.originalRuleStates = {};
 
         res.send(
 
@@ -307,29 +315,31 @@ app.get("/user-info", (req, res) => {
     res.json({
 
         loggedIn:
-        !!accessToken,
+        !!req.session.accessToken,
 
-        username,
+        username:
+        req.session.username || "",
 
         organization:
-        orgName
+        req.session.orgName || ""
     });
 });
 
 app.get("/logout", (req, res) => {
 
-    accessToken = "";
-    instanceUrl = "";
-    username = "";
-    orgName = "";
+    req.session.destroy(() => {
 
-    originalRuleStates = {};
-
-    res.redirect("/");
+        res.redirect("/");
+    });
 });
 app.get("/validation-rules", async (req, res) => {
 
     try {
+
+        if (!req.session.accessToken) {
+
+            return res.json([]);
+        }
 
         const query = `
 
@@ -345,14 +355,14 @@ app.get("/validation-rules", async (req, res) => {
 
         const response = await axios.get(
 
-            `${instanceUrl}/services/data/v59.0/tooling/query`,
+            `${req.session.instanceUrl}/services/data/v59.0/tooling/query`,
 
             {
 
                 headers: {
 
                     Authorization:
-                    `Bearer ${accessToken}`
+                    `Bearer ${req.session.accessToken}`
                 },
 
                 params: {
@@ -364,10 +374,17 @@ app.get("/validation-rules", async (req, res) => {
 
         response.data.records.forEach(rule => {
 
-            if (!(rule.Id in originalRuleStates)) {
+            if (
+                !(
+                    rule.Id
+                    in
+                    req.session.originalRuleStates
+                )
+            ) {
 
-                originalRuleStates[rule.Id] =
-                    rule.Active;
+                req.session.originalRuleStates[
+                    rule.Id
+                ] = rule.Active;
             }
         });
 
@@ -385,20 +402,21 @@ app.get("/validation-rules", async (req, res) => {
 });
 
 async function updateRule(
+    req,
     ruleId,
     status
 ) {
 
     const getResponse = await axios.get(
 
-        `${instanceUrl}/services/data/v59.0/tooling/sobjects/ValidationRule/${ruleId}`,
+        `${req.session.instanceUrl}/services/data/v59.0/tooling/sobjects/ValidationRule/${ruleId}`,
 
         {
 
             headers: {
 
                 Authorization:
-                `Bearer ${accessToken}`
+                `Bearer ${req.session.accessToken}`
             }
         }
     );
@@ -408,7 +426,7 @@ async function updateRule(
 
     await axios.patch(
 
-        `${instanceUrl}/services/data/v59.0/tooling/sobjects/ValidationRule/${ruleId}`,
+        `${req.session.instanceUrl}/services/data/v59.0/tooling/sobjects/ValidationRule/${ruleId}`,
 
         {
 
@@ -431,7 +449,7 @@ async function updateRule(
             headers: {
 
                 Authorization:
-                `Bearer ${accessToken}`,
+                `Bearer ${req.session.accessToken}`,
 
                 "Content-Type":
                 "application/json"
@@ -450,6 +468,8 @@ app.post("/deploy", async (req, res) => {
         for (const ruleId in changes) {
 
             await updateRule(
+
+                req,
 
                 ruleId,
 
@@ -488,14 +508,14 @@ app.post("/enable-all", async (req, res) => {
 
         const rules = await axios.get(
 
-            `${instanceUrl}/services/data/v59.0/tooling/query`,
+            `${req.session.instanceUrl}/services/data/v59.0/tooling/query`,
 
             {
 
                 headers: {
 
                     Authorization:
-                    `Bearer ${accessToken}`
+                    `Bearer ${req.session.accessToken}`
                 },
 
                 params: {
@@ -510,6 +530,7 @@ app.post("/enable-all", async (req, res) => {
         for (const rule of rules.data.records) {
 
             await updateRule(
+                req,
                 rule.Id,
                 true
             );
@@ -537,14 +558,14 @@ app.post("/disable-all", async (req, res) => {
 
         const rules = await axios.get(
 
-            `${instanceUrl}/services/data/v59.0/tooling/query`,
+            `${req.session.instanceUrl}/services/data/v59.0/tooling/query`,
 
             {
 
                 headers: {
 
                     Authorization:
-                    `Bearer ${accessToken}`
+                    `Bearer ${req.session.accessToken}`
                 },
 
                 params: {
@@ -559,6 +580,7 @@ app.post("/disable-all", async (req, res) => {
         for (const rule of rules.data.records) {
 
             await updateRule(
+                req,
                 rule.Id,
                 false
             );
@@ -584,13 +606,21 @@ app.post("/rollback", async (req, res) => {
 
     try {
 
-        for (const ruleId in originalRuleStates) {
+        for (
+            const ruleId
+            in
+            req.session.originalRuleStates
+        ) {
 
             await updateRule(
 
+                req,
+
                 ruleId,
 
-                originalRuleStates[ruleId]
+                req.session.originalRuleStates[
+                    ruleId
+                ]
             );
         }
 
