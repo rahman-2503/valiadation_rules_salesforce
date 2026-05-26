@@ -16,28 +16,35 @@ function showMetadataLoader() {
 
 async function loadUserInfo() {
 
-    const response = await fetch("/user-info");
+    try {
 
-    const data = await response.json();
+        const response = await fetch("/user-info");
 
-    if (data.loggedIn) {
+        const data = await response.json();
 
-        document.getElementById(
-            "loginSection"
-        ).style.display = "none";
+        if (data.loggedIn) {
 
-        document.getElementById(
-            "dashboardSection"
-        ).style.display = "block";
+            document.getElementById(
+                "loginSection"
+            ).style.display = "none";
 
-        document.getElementById(
-            "userInfo"
-        ).innerHTML = `
-            <div class="user-modern">
-                <h3>${data.username}</h3>
-                <p>${data.organization}</p>
-            </div>
-        `;
+            document.getElementById(
+                "dashboardSection"
+            ).style.display = "block";
+
+            document.getElementById(
+                "userInfo"
+            ).innerHTML = `
+                <div class="user-modern">
+                    <h3>${data.username}</h3>
+                    <p>${data.organization}</p>
+                </div>
+            `;
+        }
+
+    } catch (error) {
+
+        console.log(error);
     }
 }
 

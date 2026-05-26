@@ -2,18 +2,35 @@ const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 const crypto = require("crypto");
+const path = require("path");
+
 require("dotenv").config();
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
 
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URI = process.env.REDIRECT_URI;
-const LOGIN_URL = process.env.LOGIN_URL;
+app.use(
+    express.static(
+        path.join(__dirname, "public")
+    )
+);
+
+const PORT =
+    process.env.PORT || 5000;
+
+const CLIENT_ID =
+    process.env.CLIENT_ID;
+
+const CLIENT_SECRET =
+    process.env.CLIENT_SECRET;
+
+const REDIRECT_URI =
+    process.env.REDIRECT_URI;
+
+const LOGIN_URL =
+    process.env.LOGIN_URL;
 
 let accessToken = "";
 let instanceUrl = "";
@@ -39,8 +56,6 @@ function generateCodeChallenge(verifier) {
 const CODE_CHALLENGE =
     generateCodeChallenge(CODE_VERIFIER);
 
-
-// MODERN ANIMATED PAGE
 function renderModernPage(
     title,
     subtitle,
@@ -63,23 +78,13 @@ function renderModernPage(
 
         <title>${title}</title>
 
-        <link rel="preconnect"
-              href="https://fonts.googleapis.com">
-
-        <link rel="preconnect"
-              href="https://fonts.gstatic.com"
-              crossorigin>
-
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-              rel="stylesheet">
-
         <style>
 
             *{
                 margin:0;
                 padding:0;
                 box-sizing:border-box;
-                font-family:'Inter',sans-serif;
+                font-family:sans-serif;
             }
 
             body{
@@ -92,8 +97,6 @@ function renderModernPage(
 
                 align-items:center;
 
-                overflow:hidden;
-
                 background:
                 linear-gradient(
                     135deg,
@@ -103,195 +106,30 @@ function renderModernPage(
                 );
 
                 color:white;
-
-                position:relative;
             }
 
-            body::before{
-
-                content:"";
-
-                position:absolute;
-
-                width:500px;
-                height:500px;
-
-                background:
-                rgba(59,130,246,0.18);
-
-                filter:blur(120px);
-
-                top:-200px;
-                left:-100px;
-
-                animation:floatBlob 8s infinite ease-in-out;
-            }
-
-            body::after{
-
-                content:"";
-
-                position:absolute;
-
-                width:450px;
-                height:450px;
-
-                background:
-                rgba(168,85,247,0.18);
-
-                filter:blur(120px);
-
-                bottom:-200px;
-                right:-100px;
-
-                animation:floatBlob2 10s infinite ease-in-out;
-            }
-
-            @keyframes floatBlob{
-
-                50%{
-                    transform:
-                    translateY(40px)
-                    translateX(20px);
-                }
-            }
-
-            @keyframes floatBlob2{
-
-                50%{
-                    transform:
-                    translateY(-30px)
-                    translateX(-40px);
-                }
-            }
-
-            .glass-card{
-
-                position:relative;
-
-                width:90%;
-                max-width:500px;
+            .card{
 
                 padding:50px;
 
-                border-radius:30px;
+                border-radius:25px;
 
                 background:
                 rgba(255,255,255,0.06);
 
-                border:
-                1px solid rgba(255,255,255,0.08);
-
-                backdrop-filter:blur(20px);
-
-                box-shadow:
-                0 10px 50px rgba(0,0,0,0.4);
-
                 text-align:center;
-
-                animation:fadeIn 1s ease;
-            }
-
-            @keyframes fadeIn{
-
-                from{
-                    opacity:0;
-                    transform:translateY(40px);
-                }
-
-                to{
-                    opacity:1;
-                    transform:translateY(0);
-                }
-            }
-
-            .loader{
-
-                width:80px;
-                height:80px;
-
-                margin:auto;
-                margin-bottom:35px;
-
-                border-radius:50%;
-
-                border:
-                6px solid rgba(255,255,255,0.1);
-
-                border-top:
-                6px solid #60a5fa;
-
-                animation:spin 1s linear infinite;
-            }
-
-            @keyframes spin{
-
-                100%{
-                    transform:rotate(360deg);
-                }
             }
 
             h1{
 
-                font-size:40px;
+                margin-bottom:20px;
 
-                margin-bottom:15px;
-
-                background:
-                linear-gradient(
-                    90deg,
-                    #60a5fa,
-                    #818cf8,
-                    #c084fc
-                );
-
-                -webkit-background-clip:text;
-                -webkit-text-fill-color:transparent;
+                color:#60a5fa;
             }
 
             p{
 
                 color:#cbd5e1;
-
-                font-size:17px;
-
-                line-height:1.8;
-            }
-
-            .dots{
-                margin-top:25px;
-            }
-
-            .dots span{
-
-                display:inline-block;
-
-                width:10px;
-                height:10px;
-
-                border-radius:50%;
-
-                background:#60a5fa;
-
-                margin:0 5px;
-
-                animation:bounce 1s infinite;
-            }
-
-            .dots span:nth-child(2){
-                animation-delay:0.2s;
-            }
-
-            .dots span:nth-child(3){
-                animation-delay:0.4s;
-            }
-
-            @keyframes bounce{
-
-                50%{
-                    transform:translateY(-8px);
-                    opacity:0.5;
-                }
             }
 
         </style>
@@ -300,19 +138,11 @@ function renderModernPage(
 
     <body>
 
-        <div class="glass-card">
-
-            <div class="loader"></div>
+        <div class="card">
 
             <h1>${title}</h1>
 
             <p>${subtitle}</p>
-
-            <div class="dots">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
 
         </div>
 
@@ -333,40 +163,47 @@ function renderModernPage(
     `;
 }
 
-
-// HOME
 app.get("/", (req, res) => {
 
     res.sendFile(
-        __dirname + "/public/index.html"
-    );
-});
-
-
-// LOGIN
-app.get("/login", (req, res) => {
-
-    const authUrl =
-        `${LOGIN_URL}/services/oauth2/authorize?response_type=code`
-        + `&client_id=${CLIENT_ID}`
-        + `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`
-        + `&code_challenge=${CODE_CHALLENGE}`
-        + `&code_challenge_method=S256`
-        + `&prompt=login`
-        + `&immediate=false`;
-
-    res.send(
-        renderModernPage(
-            "Connecting Salesforce",
-            "Redirecting securely to OAuth login...",
-            authUrl,
-            1800
+        path.join(
+            __dirname,
+            "public",
+            "index.html"
         )
     );
 });
 
+app.get("/metadata.html", (req, res) => {
 
-// CALLBACK
+    res.sendFile(
+        path.join(
+            __dirname,
+            "public",
+            "metadata.html"
+        )
+    );
+});
+
+app.get("/login", (req, res) => {
+
+    const authUrl =
+
+        `${LOGIN_URL}/services/oauth2/authorize?response_type=code`
+
+        + `&client_id=${CLIENT_ID}`
+
+        + `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`
+
+        + `&code_challenge=${CODE_CHALLENGE}`
+
+        + `&code_challenge_method=S256`
+
+        + `&prompt=login`;
+
+    res.redirect(authUrl);
+});
+
 app.get("/callback", async (req, res) => {
 
     const code = req.query.code;
@@ -374,10 +211,14 @@ app.get("/callback", async (req, res) => {
     try {
 
         const tokenResponse = await axios.post(
+
             `${LOGIN_URL}/services/oauth2/token`,
+
             null,
+
             {
                 params: {
+
                     grant_type:
                     "authorization_code",
 
@@ -425,11 +266,16 @@ app.get("/callback", async (req, res) => {
             || "Salesforce";
 
         res.send(
+
             renderModernPage(
+
                 "Authentication Successful",
-                "Loading validation dashboard...",
+
+                "Loading Dashboard...",
+
                 "/",
-                2200
+
+                2000
             )
         );
 
@@ -441,71 +287,46 @@ app.get("/callback", async (req, res) => {
         );
 
         res.send(
+
             renderModernPage(
+
                 "Authentication Failed",
-                "Unable to connect with Salesforce.",
+
+                "Unable to connect with Salesforce",
+
                 "/",
+
                 2500
             )
         );
     }
 });
-//
-// USER INFO
-//
+
 app.get("/user-info", (req, res) => {
 
     res.json({
 
-        loggedIn: !!accessToken,
+        loggedIn:
+        !!accessToken,
 
         username,
 
-        organization: orgName
+        organization:
+        orgName
     });
 });
 
+app.get("/logout", (req, res) => {
 
-//
-// LOGOUT
-//
-app.get("/logout", async (req, res) => {
+    accessToken = "";
+    instanceUrl = "";
+    username = "";
+    orgName = "";
 
-    try {
+    originalRuleStates = {};
 
-        accessToken = "";
-        instanceUrl = "";
-        username = "";
-        orgName = "";
-
-        originalRuleStates = {};
-
-        res.send(
-
-            renderModernPage(
-
-                "Logged Out",
-
-                "Session cleared successfully. Redirecting to login page...",
-
-                "/",
-
-                2200
-            )
-        );
-
-    } catch (error) {
-
-        console.log(error.message);
-
-        res.redirect("/");
-    }
+    res.redirect("/");
 });
-
-
-//
-// FETCH VALIDATION RULES
-//
 app.get("/validation-rules", async (req, res) => {
 
     try {
@@ -563,10 +384,6 @@ app.get("/validation-rules", async (req, res) => {
     }
 });
 
-
-//
-// UPDATE RULE FUNCTION
-//
 async function updateRule(
     ruleId,
     status
@@ -623,10 +440,6 @@ async function updateRule(
     );
 }
 
-
-//
-// DEPLOY CHANGES
-//
 app.post("/deploy", async (req, res) => {
 
     try {
@@ -669,10 +482,6 @@ app.post("/deploy", async (req, res) => {
     }
 });
 
-
-//
-// ENABLE ALL RULES
-//
 app.post("/enable-all", async (req, res) => {
 
     try {
@@ -722,10 +531,6 @@ app.post("/enable-all", async (req, res) => {
     }
 });
 
-
-//
-// DISABLE ALL RULES
-//
 app.post("/disable-all", async (req, res) => {
 
     try {
@@ -775,10 +580,6 @@ app.post("/disable-all", async (req, res) => {
     }
 });
 
-
-//
-// ROLLBACK
-//
 app.post("/rollback", async (req, res) => {
 
     try {
@@ -815,4 +616,9 @@ app.post("/rollback", async (req, res) => {
     }
 });
 
-module.exports = app;
+app.listen(PORT, () => {
+
+    console.log(
+        `Server running on port ${PORT}`
+    );
+});

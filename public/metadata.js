@@ -2,66 +2,80 @@ let pendingChanges = {};
 
 async function loadUserInfo() {
 
-    const response = await fetch("/user-info");
+    try {
 
-    const data = await response.json();
+        const response = await fetch("/user-info");
 
-    document.getElementById("metaUserInfo").innerHTML = `
-        <div class="user-modern">
-            <h3>${data.username}</h3>
-            <p>${data.organization}</p>
-        </div>
-    `;
+        const data = await response.json();
+
+        document.getElementById("metaUserInfo").innerHTML = `
+            <div class="user-modern">
+                <h3>${data.username}</h3>
+                <p>${data.organization}</p>
+            </div>
+        `;
+
+    } catch (error) {
+
+        console.log(error);
+    }
 }
 
 async function loadValidationRules() {
 
-    const response = await fetch("/validation-rules");
+    try {
 
-    const rules = await response.json();
+        const response = await fetch("/validation-rules");
 
-    const rulesList =
-        document.getElementById("rulesList");
+        const rules = await response.json();
 
-    rulesList.innerHTML = "";
+        const rulesList =
+            document.getElementById("rulesList");
 
-    rules.forEach(rule => {
+        rulesList.innerHTML = "";
 
-        const checked =
-            pendingChanges[rule.Id] !== undefined
-            ? pendingChanges[rule.Id]
-            : rule.Active;
+        rules.forEach(rule => {
 
-        const li = document.createElement("li");
+            const checked =
+                pendingChanges[rule.Id] !== undefined
+                ? pendingChanges[rule.Id]
+                : rule.Active;
 
-        li.innerHTML = `
-            <div class="rule-card">
+            const li = document.createElement("li");
 
-                <div>
-                    <h3>${rule.ValidationName}</h3>
+            li.innerHTML = `
+                <div class="rule-card">
 
-                    <p>
-                        ${checked ? "Enabled" : "Disabled"}
-                    </p>
+                    <div>
+                        <h3>${rule.ValidationName}</h3>
+
+                        <p>
+                            ${checked ? "Enabled" : "Disabled"}
+                        </p>
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            ${checked ? "checked" : ""}
+                            onchange="toggleRule('${rule.Id}', this.checked)"
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
                 </div>
+            `;
 
-                <label class="switch">
+            rulesList.appendChild(li);
+        });
 
-                    <input
-                        type="checkbox"
-                        ${checked ? "checked" : ""}
-                        onchange="toggleRule('${rule.Id}', this.checked)"
-                    >
+    } catch (error) {
 
-                    <span class="slider"></span>
-
-                </label>
-
-            </div>
-        `;
-
-        rulesList.appendChild(li);
-    });
+        console.log(error);
+    }
 }
 
 function toggleRule(id, status) {
@@ -76,54 +90,89 @@ async function deployChanges() {
 
     deployBtn.innerText = "Deploying...";
 
-    const response = await fetch("/deploy", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            changes: pendingChanges
-        })
-    });
+    try {
 
-    const data = await response.json();
+        const response = await fetch("/deploy", {
 
-    alert(data.message);
+            method: "POST",
 
-    deployBtn.innerText = "Deploy Changes";
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-    pendingChanges = {};
+            body: JSON.stringify({
+                changes: pendingChanges
+            })
+        });
 
-    loadValidationRules();
+        const data = await response.json();
+
+        alert(data.message);
+
+        deployBtn.innerText = "Deploy Changes";
+
+        pendingChanges = {};
+
+        loadValidationRules();
+
+    } catch (error) {
+
+        console.log(error);
+
+        alert("Deployment Failed");
+
+        deployBtn.innerText = "Deploy Changes";
+    }
 }
 
 async function enableAllRules() {
 
-    await fetch("/enable-all", {
-        method: "POST"
-    });
+    try {
 
-    loadValidationRules();
+        await fetch("/enable-all", {
+            method: "POST"
+        });
+
+        loadValidationRules();
+
+    } catch (error) {
+
+        console.log(error);
+    }
 }
 
 async function disableAllRules() {
 
-    await fetch("/disable-all", {
-        method: "POST"
-    });
+    try {
 
-    loadValidationRules();
+        await fetch("/disable-all", {
+            method: "POST"
+        });
+
+        loadValidationRules();
+
+    } catch (error) {
+
+        console.log(error);
+    }
 }
 
 async function rollbackRules() {
 
-    await fetch("/rollback", {
-        method: "POST"
-    });
+    try {
 
-    alert("Rollback Successful");
+        await fetch("/rollback", {
+            method: "POST"
+        });
 
-    loadValidationRules();
+        alert("Rollback Successful");
+
+        loadValidationRules();
+
+    } catch (error) {
+
+        console.log(error);
+    }
 }
 
 function goHome() {
